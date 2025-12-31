@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Regression using Normal Equation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #60a5fa 0%, #dc2626 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, #dc2626 0%, #60a5fa 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        }
+        
+        .dataset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .btn.active {
+            background: #60a5fa;
+            color: white;
+            box-shadow: 0 5px 15px rgba(96, 165, 250, 0.4);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .result-card {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .result-card h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .param-row {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .param-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .param-value {
+            font-family: 'Courier New', monospace;
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        .r2-score {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .r2-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+        
+        .chart-container {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .math-steps {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .math-step {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .math-step h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .math-code {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #dc2626;
+        }
+        
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .dataset-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linear Regression using Normal Equation</h1>
+        <p class="subtitle">Solving Linear Regression with Pure Linear Algebra (No Gradient Descent!)</p>
+        
+        <div class="section">
+            <div class="formula-box">
+                θ = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y
+            </div>
+            <p style="color: #4a5568; margin-bottom: 20px;">
+                This formula directly computes the optimal parameters using matrix operations: transpose, multiplication, and inverse.
+            </p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Choose Dataset:</div>
+            <div class="dataset-buttons">
+                <button class="btn btn-primary active" onclick="loadDataset('housing')">Housing Prices</button>
+                <button class="btn btn-primary" onclick="loadDataset('students')">Student Performance</button>
+                <button class="btn btn-primary" onclick="loadDataset('books')">Book Sales</button>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            <div class="result-card">
+                <h3>Model Parameters</h3>
+                <div class="param-row">
+                    <span class="param-label">Intercept (θ₀):</span>
+                    <span class="param-value" id="theta0">-</span>
+                </div>
+                <div class="param-row">
+                    <span class="param-label">Slope (θ₁):</span>
+                    <span class="param-value" id="theta1">-</span>
+                </div>
+                <div class="param-row" style="background: #edf2f7;">
+                    <span class="param-label">Equation:</span>
+                    <span class="param-value" id="equation">-</span>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <h3>Model Performance</h3>
+                <div class="r2-score">
+                    <div class="r2-number" id="r2Score">-</div>
+                    <div style="color: #4a5568; font-weight: 600;">R² Score</div>
+                    <div style="color: #718096; margin-top: 10px;" id="r2Label">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Visualization</div>
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="toggleMath()" style="width: 100%; margin-bottom: 20px;">
+            <span id="toggleText">▶ Show Step-by-Step Matrix Calculations</span>
+        </button>
+
+        <div id="mathSteps" class="math-steps hidden">
+            <div class="math-step">
+                <h4>Step 1: Transpose X</h4>
+                <div class="math-code" id="step1">-</div>
+            </div>
+            <div class="math-step">
+                <h4>Step 2: Multiply X<sup>T</sup>X</h4>
+                <div class="math-code" id="step2">-</div>
+            </div>
+            <div class="math-step">
+                <h4>Step 3: Inverse (X<sup>T</sup>X)<sup>-1</sup></h4>
+                <div class="math-code" id="step3">-</div>
+            </div>
+            <div class="math-step">
+                <h4>Step 4: Final θ</h4>
+                <div class="math-code" id="step4">-</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>🎯 Linear Algebra Concepts Used</h3>
+            <ul>
+                <li><strong>Matrix Transpose:</strong> Flipping rows and columns (X<sup>T</sup>)</li>
+                <li><strong>Matrix Multiplication:</strong> Computing X<sup>T</sup>X and other products</li>
+                <li><strong>Matrix Inverse:</strong> Finding (X<sup>T</sup>X)<sup>-1</sup></li>
+                <li><strong>Closed-Form Solution:</strong> One formula gives exact answer (no iterations!)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Dataset definitions
+        const datasets = {
+            housing: {
+                name: 'Housing Prices',
+                X: [[1, 1200], [1, 1500], [1, 1800], [1, 2000], [1, 2200], [1, 2500], [1, 2800], [1, 3000]],
+                y: [200000, 250000, 280000, 320000, 340000, 380000, 420000, 450000],
+                xLabel: 'Square Feet',
+                yLabel: 'Price ($)'
+            },
+            students: {
+                name: 'Student Performance',
+                X: [[1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8], [1, 9], [1, 10]],
+                y: [55, 58, 70, 68, 78, 75, 85, 90, 88],
+                xLabel: 'Study Hours',
+                yLabel: 'Test Score'
+            },
+            books: {
+                name: 'Book Sales',
+                X: [[1, 5], [1, 8], [1, 12], [1, 15], [1, 18], [1, 22], [1, 25], [1, 30]],
+                y: [45, 65, 80, 95, 88, 115, 125, 140],
+                xLabel: 'Marketing Budget ($1000s)',
+                yLabel: 'Books Sold (units)'
+            }
+        };
+
+        let currentChart = null;
+        let currentDataset = 'housing';
+        let mathVisible = false;
+
+        // Matrix operations
+        function matrixMultiply(A, B) {
+            const result = [];
+            for (let i = 0; i < A.length; i++) {
+                result[i] = [];
+                for (let j = 0; j < B[0].length; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < A[0].length; k++) {
+                        sum += A[i][k] * B[k][j];
+                    }
+                    result[i][j] = sum;
+                }
+            }
+            return result;
+        }
+
+        function transpose(matrix) {
+            return matrix[0].map((_, i) => matrix.map(row => row[i]));
+        }
+
+        function inverse2x2(matrix) {
+            const [[a, b], [c, d]] = matrix;
+            const det = a * d - b * c;
+            if (Math.abs(det) < 1e-10) throw new Error('Matrix is singular');
+            return [
+                [d / det, -b / det],
+                [-c / det, a / det]
+            ];
+        }
+
+        function normalEquation(X, y) {
+            const yCol = y.map(val => [val]);
+            const XT = transpose(X);
+            const XTX = matrixMultiply(XT, X);
+            const XTX_inv = inverse2x2(XTX);
+            const XTX_inv_XT = matrixMultiply(XTX_inv, XT);
+            const theta = matrixMultiply(XTX_inv_XT, yCol);
+            
+            return {
+                theta: theta.map(row => row[0]),
+                steps: { XT, XTX, XTX_inv, XTX_inv_XT }
+            };
+        }
+
+        function loadDataset(datasetName) {
+            currentDataset = datasetName;
+            
+            // Update button states
+            document.querySelectorAll('.dataset-buttons .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            calculateAndDisplay();
+        }
+
+        function calculateAndDisplay() {
+            const data = datasets[currentDataset];
+            const { theta, steps } = normalEquation(data.X, data.y);
+            
+            // Make predictions
+            const predictions = data.X.map(row => 
+                row.reduce((sum, val, i) => sum + val * theta[i], 0)
+            );
+            
+            // Calculate R²
+            const yMean = data.y.reduce((a, b) => a + b, 0) / data.y.length;
+            const ssTotal = data.y.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
+            const ssRes = data.y.reduce((sum, val, i) => sum + Math.pow(val - predictions[i], 2), 0);
+            const r2 = 1 - (ssRes / ssTotal);
+            
+            // Update UI
+            document.getElementById('theta0').textContent = theta[0].toFixed(2);
+            document.getElementById('theta1').textContent = theta[1].toFixed(4);
+            document.getElementById('equation').textContent = `y = ${theta[0].toFixed(2)} + ${theta[1].toFixed(4)}x`;
+            document.getElementById('r2Score').textContent = `${(r2 * 100).toFixed(1)}%`;
+            document.getElementById('r2Label').textContent = r2 > 0.9 ? '(Excellent Fit)' : r2 > 0.7 ? '(Good Fit)' : '(Fair Fit)';
+            
+            // Update math steps
+            document.getElementById('step1').textContent = `X^T = ${JSON.stringify(steps.XT)}`;
+            document.getElementById('step2').textContent = `X^T X = ${JSON.stringify(steps.XTX)}`;
+            document.getElementById('step3').textContent = `(X^T X)^-1 = ${JSON.stringify(steps.XTX_inv.map(row => row.map(v => v.toFixed(8))))}`;
+            document.getElementById('step4').textContent = `θ = ${JSON.stringify(theta.map(v => v.toFixed(6)))}`;
+            
+            // Update chart
+            updateChart(data, predictions);
+        }
+
+        function updateChart(data, predictions) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            const xValues = data.X.map(row => row[1]);
+            
+            currentChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Actual Data',
+                        data: xValues.map((x, i) => ({x: x, y: data.y[i]})),
+                        backgroundColor: 'rgba(96, 165, 250, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }, {
+                        label: 'Predicted Line',
+                        data: xValues.map((x, i) => ({x: x, y: predictions[i]})),
+                        type: 'line',
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 14 },
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: data.xLabel,
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: data.yLabel,
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleMath() {
+            mathVisible = !mathVisible;
+            const mathSteps = document.getElementById('mathSteps');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (mathVisible) {
+                mathSteps.classList.remove('hidden');
+                toggleText.textContent = '▼ Hide Step-by-Step Matrix Calculations';
+            } else {
+                mathSteps.classList.add('hidden');
+                toggleText.textContent = '▶ Show Step-by-Step Matrix Calculations';
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            calculateAndDisplay();
+        };
+    </script>
+</body>
+</html>

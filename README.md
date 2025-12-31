@@ -61,10 +61,7 @@ By implementing core linear algebra concepts (transpose, multiplication, inverse
 
 ## Contributors
 
-- **Judy Abuquta** (S22107883) - Mathematical derivation, algorithm design
-- **Sarah Eid** (S22107757) - Web implementation, visualization, testing
-- **Nadine Elhaddad** (S22107736) - Dataset preparation, documentation
-- **Abeer Hussein** (S22107714) - Analysis, report writing, validation
+- Sarah Eid | [Judy Abuquta](https://github.com/JudyAbuquta) | Nadine Elhaddad | [Abeer Hussain](https://github.com/abeerahrar) 
 
 ## How to Use
 

@@ -66,11 +66,10 @@ By implementing core linear algebra concepts (transpose, multiplication, inverse
 ## How to Use
 
 ### Running the Application
-1. **Simple Method**: Open `index.html` directly in any modern web browser
-2. **GitHub Pages**: Deploy using GitHub Pages for online access
+1. **Simple Method**: Open `linear_regression.html` directly in any modern web browser
 3. **Local Server**: Run a local server for full functionality
 
 
 ---
 
-**Tags**: `linear-algebra` `linear-regression` `normal-equation` `javascript` `machine-learning` `mathematics` `education` `data-science` `matrix-operations` `interactive-learning`
+**Tags**: `linear-algebra` `linear-regression` `normal-equation` `javascript` `machine-learning` `mathematics` `data-science` `matrix-operations` `interactive-learning`

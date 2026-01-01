@@ -16,7 +16,7 @@ By implementing core linear algebra concepts (transpose, multiplication, inverse
 - **Step-by-Step Matrix Calculations**: Toggle to view each mathematical operation (Transpose, Multiplication, Inverse) in detail
 - **Three Real-World Datasets**: Applied to Housing Prices, Student Performance, and Book Sales scenarios
 - **Complete Model Interpretation**: Calculates intercept (θ₀), slope (θ₁), and R² score with practical interpretations
-- **No External Dependencies**: Self-contained implementation using only vanilla JavaScript
+- **No External Dependencies**: Self-contained implementation using only JavaScript
 
 ## Results Summary
 
@@ -38,7 +38,7 @@ By implementing core linear algebra concepts (transpose, multiplication, inverse
 ## Technologies Used
 
 - **Frontend**: HTML5, CSS3 (Custom responsive design with gradients)
-- **Programming**: Vanilla JavaScript (ES6) with custom matrix operations
+- **Programming**: JavaScript (ES6) with custom matrix operations
 - **Visualization**: Chart.js for dynamic scatter plots and regression lines
 - **Mathematical Implementation**: Custom transpose(), matrixMultiply(), and inverse2x2() functions
 
